@@ -75,6 +75,7 @@ public class MigrationManager {
     /**
      * 注册 迁移操作
      * @param migrationList 迁移对象
+     * @return self
      */
     public MigrationManager registerMigration(AbstractMigration... migrationList) {
         this.migrationList.addAll(Arrays.stream(migrationList).collect(Collectors.toList()));
