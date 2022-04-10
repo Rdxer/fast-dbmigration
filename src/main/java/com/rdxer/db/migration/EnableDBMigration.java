@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Documented
 @Import({
         MigrationManager.class,
-//        MigrationRunner.class
+        MigrationRunner.class
 })
 public @interface EnableDBMigration {
 

@@ -35,7 +35,7 @@ public class ScriptMigration extends AbstractMigration {
     // 执行 迁移
     @Override
     public boolean exec(MigrationManager migrationManager, TransactionStatus status) {
-        System.out.println("versionName:%s \nexec sql >>\n%s \n<< %n".formatted(versionName, getScript()));
+        System.out.println(String.format("versionName:%s \nexec sql >>\n%s \n<< %n", versionName, getScript()));
 
         migrationManager.getJdbcTemplate().execute(this.script);
 

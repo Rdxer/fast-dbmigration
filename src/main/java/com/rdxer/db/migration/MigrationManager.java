@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -75,7 +76,7 @@ public class MigrationManager {
      * 注册 迁移操作
      */
     public MigrationManager registerMigration(AbstractMigration... migrationList) {
-        this.migrationList.addAll(Arrays.stream(migrationList).toList());
+        this.migrationList.addAll(Arrays.stream(migrationList).collect(Collectors.toList()));
         return this;
     }
 
@@ -107,7 +108,7 @@ public class MigrationManager {
 
         // 2. 查询表数据中版本的记录
 
-        List<MigrationHistory> dbHistoryList = jdbcTemplate.query("select * from %s order by id".formatted(config.table_name), new MigrationHistory());
+        List<MigrationHistory> dbHistoryList = jdbcTemplate.query(String.format("select * from %s order by id", config.table_name), new MigrationHistory());
         this.lastId = dbHistoryList.size();
 
         // 4. 采集注册的 迁移信息，与数据库的作为比对，迁移的记录数量。
@@ -153,16 +154,16 @@ public class MigrationManager {
                 if (migration.exec(this, status)) {
                     // 执行成功 添加记录
                     long time = System.currentTimeMillis();
-                    jdbcTemplate.update("insert into %s (id, version, execdate) values (?,?,?)".formatted(config.table_name), lastId, migration.getVersionName(), time);
+                    jdbcTemplate.update(String.format("insert into %s (id, version, execdate) values (?,?,?)", config.table_name), lastId, migration.getVersionName(), time);
                     System.out.printf("数据库执行迁移成功 << ID(%d) version(%s)%n", lastId, migration.getVersionName());
                     lastId++;
                 } else {
                     // 回滚
-                    throw new RuntimeException("数据库迁移操作错误 >> ID(%d) version(%s)".formatted(lastId, migration.getVersionName()));
+                    throw new RuntimeException(String.format("数据库迁移操作错误 >> ID(%d) version(%s)", lastId, migration.getVersionName()));
                 }
             } else {
                 // 回滚
-                throw new RuntimeException("数据库迁移操作错误 >> ID(%d) version(%s)".formatted(lastId, migration.getVersionName()));
+                throw new RuntimeException(String.format("数据库迁移操作错误 >> ID(%d) version(%s)", lastId, migration.getVersionName()));
             }
         }
         // 执行完毕
@@ -190,14 +191,14 @@ public class MigrationManager {
         );
 
         String[] dbconf = confMap.get(config.dbType);
-        if (!StringUtils.hasText(dbconf[0]) || !StringUtils.hasText(dbconf[1])) {
+        if (StringEx.isEmpty(dbconf[0]) || StringEx.isEmpty(dbconf[1])) {
             System.out.println(dbconf[0]);
             System.out.println(dbconf[1]);
             throw new RuntimeException("请直接配置:迁移数据库表{db.migration.DDL} 以及 查找表{db.migration.find_table}");
         }
 
-        this.findTableSQL = dbconf[0].formatted(config.table_name);
-        this.migrationDDL = dbconf[1].formatted(config.table_name);
+        this.findTableSQL = String.format(dbconf[0], config.table_name);
+        this.migrationDDL = String.format(dbconf[1], config.table_name);
 
         return this;
     }
