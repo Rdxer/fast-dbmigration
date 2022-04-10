@@ -4,6 +4,7 @@ fast - dbmigration by springboot
 数据库迁移工具
 目前支持 MySql，PGSql。
 
+[demo](https://github.com/Rdxer/demo-fast-dbauto-dbmigration.git)
 
 # 集成
 ## 1. 添加依赖
