@@ -8,7 +8,10 @@ public class ActionMigration extends AbstractMigration {
 
     public interface IMigrationExec {
         /**
-         * 返回 false 表示执行失败
+         * 执行迁移
+         * @param migrationManager 迁移mng
+         * @param status 事务对象
+         * @return  返回 false 表示执行失败
          */
         boolean exec(MigrationManager migrationManager, TransactionStatus status);
     }
